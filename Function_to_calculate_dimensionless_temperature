@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 
 # --- Parâmetros físicos ---
-alpha = 1e-5     # difusividade térmica [m^2/s]
+alpha = 3.2e-5     # difusividade térmica [m^2/s] - k/p.cp = 0.03/0.946.1005 considerando o ar seco a 373 K.
 r0 = 0.003        # raio da esfera [m]
 T_inf = 373      # temperatura do fluido [K]
 T_i = 303        # temperatura inicial da esfera [K]
