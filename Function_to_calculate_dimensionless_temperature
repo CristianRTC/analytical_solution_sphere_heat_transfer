@@ -8,14 +8,14 @@ r0 = 0.003        # raio da esfera [m]
 T_inf = 373      # temperatura do fluido [K]
 T_i = 303        # temperatura inicial da esfera [K]
 Bi = 1000         # número de Biot
-N_terms = 5      # número de termos na série
+N_terms = 10      # número de termos na série
 
 # --- Equação transcendental: 1 - zeta * cot(zeta) = Bi ---
 def transcendental_eq(zeta, Bi):
     return 1 - zeta / np.tan(zeta) - Bi
 
 # Estimar as raízes zeta_n
-zeta_guesses = np.arange(1, N_terms + 1) * np.pi
+zeta_guesses = np.arange(1, N_terms + 0.5) * np.pi
 zeta_n = np.array([fsolve(transcendental_eq, guess, args=(Bi))[0] for guess in zeta_guesses])
 
 # --- Coeficientes C_n ---
