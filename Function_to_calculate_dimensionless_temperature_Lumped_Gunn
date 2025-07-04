@@ -1,0 +1,57 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# --- Propriedades do fluido (ar a 500 °C) *** aproximação das condições reais ---
+rho_f = 0.615           # densidade [kg/m³]
+mu = 3.68e-5            # viscosidade dinâmica [Pa.s]
+kf = 0.052              # condutividade térmica [W/m.K]
+cp_f = 1040             # calor específico do fluido [J/kg.K]
+Pr = cp_f * mu / kf     # número de Prandtl
+D = 4.5e-5              # difusividade (não usado aqui p/ Gunn)
+
+# --- Propriedades da partícula ---
+rho = 900               # densidade [kg/m³]
+c = 1700                # calor específico (aproximação) [J/kg·K]
+k = 0.25                # condutividade da partícula (aproximação) [W/m·K]
+r0 = 0.003              # raio da esfera (SGN = 600) [m]
+d = 2 * r0              # diâmetro
+V = (4/3) * np.pi * r0**3
+As = 4 * np.pi * r0**2
+epsilon = 0.4           # porosidade (aproximação)
+
+# --- Condições de escoamento ---
+u = 0.03                # velocidade média do fluido [m/s]
+Re = rho_f * u * d / mu
+
+# --- Correlação de Gunn ---
+def Nu_Gunn(Re, Pr, epsilon):
+    term1 = (7 - 10 * epsilon + 5 * epsilon**2) * (1 + 0.7 * Re**0.2 * Pr**(1/3))
+    term2 = (1.33 - 2.4 * epsilon + 1.2 * epsilon**2) * Re**0.7 * Pr**(1/3)
+    return term1 + term2
+
+Nu = Nu_Gunn(Re, Pr, epsilon)
+h = Nu * kf / d
+
+print(f"Re = {Re:.2f}, Pr = {Pr:.2f}, Nu = {Nu:.2f}, h = {h:.2f} W/m²·K")
+
+# --- Condições térmicas ---
+T_inf = 373       # temperatura do fluido [K]
+T_i = 303         # temperatura inicial da partícula [K]
+
+# --- Tempo real (segundos) ---
+t_vals = np.linspace(0, 100, 50)
+
+# --- Solução da equação (5.6) ---
+exponent = - (h * As) / (rho * V * c) * t_vals
+T_vals = T_inf + (T_i - T_inf) * np.exp(exponent)
+
+# --- Plotagem ---
+plt.figure(figsize=(10, 6))
+plt.plot(t_vals, T_vals, label='Modelo Lumped com h da correlação de Gunn', color='darkgreen')
+plt.xlabel('Tempo [s]')
+plt.ylabel('Temperatura da partícula [K]')
+plt.title('Aquecimento de uma Esfera - Lumped + Correlação de Gunn')
+plt.grid(True)
+plt.legend()
+plt.tight_layout()
+plt.show()
